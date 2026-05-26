@@ -1,4 +1,5 @@
 # Observed main-process environment for the current Xamt++ snapshot.
+# NumPy and SciPy are helper dependencies, not target DL libraries.
 # Platform-specific CUDA/CPU wheels may require adjusted install commands.
 numpy==2.2.6
 scipy==1.16.3

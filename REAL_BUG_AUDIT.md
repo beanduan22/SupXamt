@@ -1,5 +1,8 @@
 # Real Bug Audit
 
+> Note: this audit belongs to the previous generated snapshot. Regenerate the
+> candidate table before reporting DL-only Xamt++ bug counts.
+
 Snapshot: `2026-05-25 16:00:44 AEST`
 
 Current candidate table: 194 unique DIFF keys / 137 base API groups.

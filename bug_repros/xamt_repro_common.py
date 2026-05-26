@@ -19,7 +19,7 @@ import diff_static_candidate_groups as runner
 from compare_api_matchers import Api, collect_apis
 from timed_group_fuzz import install_fuzz_state
 
-REFERENCE_ORDER = ["numpy", "scipy", "jax", "tensorflow", "torch", "paddle", "keras", "chainer", "mxnet", "mindspore"]
+REFERENCE_ORDER = ["jax", "tensorflow", "torch", "paddle", "keras", "chainer", "mxnet", "mindspore"]
 API_BY_NAME = None
 
 

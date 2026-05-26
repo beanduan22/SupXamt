@@ -1,5 +1,9 @@
 # Pairwise Adapter-Aware Expansion
 
+> Note: this is a legacy 10-library snapshot kept for traceability. The current
+> Xamt++ target set excludes NumPy and SciPy as standalone libraries; regenerate
+> this summary before reporting DL-only counts.
+
 Strategy: `pairwise-adapter-aware` clusters executable pair matches into connected functionality groups. It does not emit each pair as a separate group.
 Full component JSONL: `/tmp/xamt_pairwise_adapter_components_static_10libs.jsonl`
 

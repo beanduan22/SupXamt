@@ -1,5 +1,8 @@
 # All Xamt Bug Candidates
 
+> Note: this candidate table comes from a pre-DL-only target snapshot.
+> Regenerate it before reporting Xamt++ counts without standalone NumPy/SciPy.
+
 Snapshot: `2026-05-25 14:29:54 AEST`
 Count definition: unique executable DIFF group keys; current-code ERROR/SKIP/PASS rows are not counted.
 

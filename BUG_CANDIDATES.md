@@ -1,5 +1,8 @@
 # Xamt Adapter Fuzz Bug Candidates
 
+> Note: this candidate table comes from a pre-DL-only target snapshot.
+> Regenerate it before reporting Xamt++ counts without standalone NumPy/SciPy.
+
 Source run: `/tmp/xamt_adapter_fuzz_9libs_60s.jsonl`
 Run ended: `2026-05-21 18:40:12 AEST`
 Scope: 9-library `adapter-aware` timed fuzz, 60 seconds per group, non-finite inputs disabled.

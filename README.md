@@ -3,10 +3,14 @@
 Xamt++ is the release artifact for the current cross-framework API matching and
 differential testing pipeline. It extends the original XAMT prototype from a
 small set of framework shims to an adapter-aware matcher and runner covering
-10 numerical and deep-learning libraries:
+8 deep-learning libraries:
 
-`chainer`, `jax`, `keras`, `mindspore`, `mxnet`, `numpy`, `paddle`, `scipy`,
-`tensorflow`, and `torch`.
+`chainer`, `jax`, `keras`, `mindspore`, `mxnet`, `paddle`, `tensorflow`,
+and `torch`.
+
+NumPy and SciPy are not standalone target libraries in the Xamt++ method. They
+may still appear as runtime helpers or as framework-owned namespaces such as
+`jax.numpy`, `mxnet.numpy`, or `mindspore.scipy`.
 
 The artifact contains the code used to mine APIs, form cross-library
 equivalence groups, validate those groups through adapters, fuzz the executable
@@ -42,16 +46,16 @@ The current Xamt++ pipeline is driven by `tools/` and `bug_repros/`.
 Current artifact snapshot: `2026-05-25`.
 
 | Metric | Count |
-| --- | ---: |
-| Libraries | 10 |
-| Pairwise adapter-aware groups | 650 |
-| Unique APIs in executable groups | 4372 |
-| Raw mined APIs | 8782 |
-| Static pairwise DIFF groups | 46 |
-| Current unique DIFF candidates | 194 keys / 137 base groups |
-| Recommended likely real bugs | 190 keys / 133 base groups |
-| Strict reportable bugs | 188 keys / 131 base groups |
-| Current live reproducible DIFF scripts | 177 |
+| --- | --- |
+| Target DL libraries | 8 |
+| Pairwise adapter-aware groups | regenerate for DL-only target set |
+| Unique APIs in executable groups | regenerate for DL-only target set |
+| Raw mined APIs in target libraries | 7780 |
+| Static pairwise DIFF groups | regenerate for DL-only target set |
+| Current unique DIFF candidates | regenerate for DL-only target set |
+| Recommended likely real bugs | regenerate for DL-only target set |
+| Strict reportable bugs | regenerate for DL-only target set |
+| Current live reproducible DIFF scripts | regenerate for DL-only target set |
 
 The count definitions and evidence are recorded in
 `PAIRWISE_ADAPTER_SUMMARY.md`, `ALL_BUG_CANDIDATES.md`,
@@ -59,17 +63,20 @@ The count definitions and evidence are recorded in
 
 ## Environment Model
 
-The full 10-library run uses one main Python process plus optional external
+The full 8-library DL run uses one main Python process plus optional external
 Python workers for libraries that conflict with the main environment.
 
-Main process:
+Main target libraries:
 
-- `numpy`
-- `scipy`
 - `torch`
 - `tensorflow`
 - `keras`
 - `jax`
+
+Helper dependencies, not target libraries:
+
+- `numpy`
+- `scipy`
 
 External workers:
 
@@ -83,7 +90,7 @@ API collection or reports it as unavailable during execution. This lets partial
 runs work in a single environment while keeping the full artifact reproducible
 on a machine with all worker environments installed.
 
-Observed local main environment:
+Observed local main environment (target libraries plus helpers):
 
 ```text
 Python 3.13.5
@@ -108,7 +115,7 @@ cd Xamt
 python -B tools/artifact_check.py
 ```
 
-Inspect matched API coverage from the recorded summary.
+Inspect matched API coverage after regenerating the summary for the DL-only target set.
 
 ```bash
 sed -n '1,35p' PAIRWISE_ADAPTER_SUMMARY.md
@@ -168,11 +175,11 @@ python -B tools/build_artifact.py --out dist/xamtplusplus-artifact.tar.gz
 
 Use the following default language when reporting this artifact:
 
-> Xamt++ covers 10 libraries, 650 adapter-aware API groups, and 4372 APIs in
-> executable matched groups. The current candidate table contains 194 unique
-> DIFF keys across 137 base API groups. After manual false-positive audit, the
-> recommended count is 190 likely real differential bugs across 133 base
-> groups; a stricter reportable count is 188 bugs across 131 base groups.
+> Xamt++ targets 8 deep-learning libraries: Chainer, JAX, Keras, MindSpore,
+> MXNet, Paddle, TensorFlow, and PyTorch. NumPy and SciPy are helper/reference
+> packages only and are not counted as target libraries. Regenerate the
+> pairwise summary and bug-candidate tables after changing the target set before
+> reporting final DL-only counts.
 
 ## Citation
 

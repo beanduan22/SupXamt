@@ -1,5 +1,8 @@
 # Verified XAMT Reproductions
 
+> Note: these reproductions were audited for the previous generated snapshot.
+> Regenerate this package before reporting DL-only Xamt++ counts.
+
 Strict rule: only current live `status: DIFF` outputs are counted as real reproducible bugs. No stored fallback is counted.
 
 - Candidate scripts audited: 188

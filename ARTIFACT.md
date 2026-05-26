@@ -5,16 +5,15 @@ written for reviewers or maintainers who start from a clean checkout.
 
 ## Claims Covered by This Artifact
 
-The artifact supports these claims:
+The artifact is configured for these claims:
 
-- Xamt++ mines APIs from 10 libraries.
-- It builds 650 pairwise adapter-aware cross-library API groups.
-- Those groups contain 4372 unique API memberships.
-- Differential testing currently yields 194 unique DIFF candidate keys.
-- After manual audit, 190 keys are likely real differential bugs; 188 are the
-  stricter reportable set.
-- The replay package contains 188 curated scripts, of which 177 currently
-  reproduce live `status: DIFF` outputs in the audited environment.
+- Xamt++ mines APIs from 8 target deep-learning libraries: Chainer, JAX,
+  Keras, MindSpore, MXNet, Paddle, TensorFlow, and PyTorch.
+- NumPy and SciPy are not target libraries in the Xamt++ method. They may only
+  appear as helper/runtime dependencies or inside framework-owned namespaces
+  such as `jax.numpy`, `mxnet.numpy`, and `mindspore.scipy`.
+- Pairwise group counts, DIFF counts, and replay counts must be regenerated
+  after changing the target set before they are reported as DL-only results.
 
 The supporting files are:
 
@@ -52,8 +51,8 @@ have incompatible Python and dependency constraints.
 
 ### Main Environment
 
-The main process needs NumPy/SciPy plus the libraries that can coexist in the
-same Python environment:
+The main process needs helper packages plus the target DL libraries that can
+coexist in the same Python environment:
 
 ```bash
 python -m venv .venv-main
@@ -86,7 +85,7 @@ these conventional paths when present:
 ```
 
 External worker availability changes coverage. A single-environment run is
-useful for debugging but should not be used for the published 10-library count.
+useful for debugging but should not be used for the full 8-library DL count.
 
 ## Sanity Check
 
@@ -97,20 +96,13 @@ cd Xamt
 python -B tools/artifact_check.py
 ```
 
-Expected high-level output:
-
-```text
-artifact_status: ok
-pairwise_groups: 650
-pairwise_unique_apis: 4372
-bug_records: 188
-bug_scripts: 188
-```
+Expected high-level output confirms the configured target library count and
+checks that generated replay metadata is internally consistent.
 
 ## Reproduce Static Matching Coverage
 
-The fastest way to inspect the published coverage is to read the recorded
-summary:
+The fastest way to inspect recorded coverage is to read the summary after it
+has been regenerated for the current DL-only target set:
 
 ```bash
 sed -n '1,35p' PAIRWISE_ADAPTER_SUMMARY.md
@@ -188,7 +180,7 @@ The builder runs `tools/artifact_check.py` before creating the archive unless
 
 - The result JSONL files from some historical `/tmp` runs are summarized in
   markdown but not all raw shard files are kept in this source artifact.
-- Full 10-library reproduction requires external worker environments.
+- Full 8-library DL reproduction requires external worker environments.
 - Some DIFF rows are edge-value or numerical-branch behavior and require
   manual documentation review before filing upstream bugs.
 - `ERROR` rows in triage summaries are mostly adapter/input-plan work or

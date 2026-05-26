@@ -6,6 +6,10 @@ import re
 from typing import Union
 
 
+# Xamt++ targets deep-learning framework APIs. NumPy and SciPy are intentionally
+# not standalone target libraries here; they may still appear as implementation
+# helpers or as namespaces owned by DL frameworks, such as jax.numpy or
+# mindspore.scipy.
 NAMESPACES = {
     "torch": [
         "torch",
@@ -53,20 +57,6 @@ NAMESPACES = {
         "jax.scipy.linalg",
         "jax.scipy.signal",
         "jax.scipy.stats",
-    ],
-    "numpy": [
-        "numpy",
-        "numpy.linalg",
-        "numpy.fft",
-        "numpy.random",
-    ],
-    "scipy": [
-        "scipy.special",
-        "scipy.linalg",
-        "scipy.signal",
-        "scipy.stats",
-        "scipy.fft",
-        "scipy.ndimage",
     ],
     "paddle": [
         "paddle",
