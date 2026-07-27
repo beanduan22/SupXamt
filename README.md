@@ -1,10 +1,10 @@
-# Xamt++: Adapter-Aware Cross-Framework API Differential Testing
+# Xamt: Cross-Framework API Differential Testing
 
-Xamt++ is a cross-framework API matching and differential testing pipeline for
+Xamt is a cross-framework API matching and differential testing pipeline for
 deep-learning libraries. The target libraries are Chainer, JAX, Keras,
 MindSpore, MXNet, PaddlePaddle, TensorFlow, and PyTorch.
 
-NumPy and SciPy are not standalone target libraries in the Xamt++ method. They
+NumPy and SciPy are not standalone target libraries in the Xamt method. They
 may appear as runtime helpers or as framework-owned namespaces such as
 `jax.numpy`, `mxnet.numpy`, or `mindspore.scipy`.
 
@@ -38,7 +38,7 @@ adapter-validated groups.
 
 The older `functions/`, `inputs/`, `run_tasks/`, `tests/`, and `utilities/`
 directories are retained for compatibility with the original XAMT artifact.
-The current Xamt++ pipeline is driven by `tools/`.
+The current Xamt pipeline is driven by `tools/`.
 
 ## Environment Model
 
