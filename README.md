@@ -2,7 +2,7 @@
 
 Xamt is a cross-framework API matching and differential testing pipeline for
 deep-learning libraries. The target libraries are Chainer, JAX, Keras,
-MindSpore, MXNet, PaddlePaddle, TensorFlow, and PyTorch.
+MindSpore, PaddlePaddle, TensorFlow, and PyTorch.
 
 NumPy and SciPy are not standalone target libraries in the Xamt method. They
 may appear as runtime helpers or as framework-owned namespaces such as
