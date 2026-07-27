@@ -5,8 +5,6 @@ from functions.torch_functions import torch_as_strided
 from functions.tf_functions import tf_strided_slice
 
 api_functions = {
-    # "pytorch_as_strided": torch_as_strided,
-    # "tensorflow_strided_slice": tf_strided_slice,
 }
 
 @given(input_data=generate_as_strided_inputs())

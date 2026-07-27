@@ -1,10 +1,3 @@
-"""Batch differential probes for high-confidence matched DL APIs.
-
-This script compares a fixed set of common tensor APIs across PyTorch,
-TensorFlow, Keras, JAX, Paddle, and MindSpore. Paddle and MindSpore are run in
-separate Python processes because their native dependencies can conflict with
-the main environment and with each other.
-"""
 
 from __future__ import annotations
 

@@ -19,12 +19,10 @@ def torch_add(x, y, alpha=1):
 
 
 def torch_addbmm(A, B, C, beta=1, alpha=1):
-    # Ensure all tensors are three-dimensional
     A = A.unsqueeze(0) if A.dim() == 2 else A
     B = B.unsqueeze(0) if B.dim() == 2 else B
     C = C.unsqueeze(0) if C.dim() == 2 else C
 
-    # Use repeat to safely adjust dimensions if needed
     max_batch_size = max(A.size(0), B.size(0), C.size(0))
     A = A.repeat(max_batch_size // A.size(0), 1, 1)
     B = B.repeat(max_batch_size // B.size(0), 1, 1)
@@ -41,8 +39,8 @@ def torch_addcmul(x, tensor1, tensor2, value=1):
 
 
 def torch_addmm(input, mat1, mat2, beta=1.0, alpha=1.0):
-    beta = float(beta)  # 确保为标量
-    alpha = float(alpha)  # 确保为标量
+    beta = float(beta)
+    alpha = float(alpha)
     return torch.addmm(input, mat1, mat2, beta=beta, alpha=alpha)
 
 def torch_addmv(x, y, z, beta=1, alpha=1):
@@ -61,12 +59,9 @@ def torch_amin(x):
     return torch.amin(x).item()
 
 def torch_angle(x):
-    # 检查输入是否为非空张量
     if x.nelement() == 0:
         raise ValueError("Input tensor is empty.")
-    # 计算相位角
     angle = torch.angle(x)
-    # 根据元素数量返回合适的结果
     return angle.item() if angle.nelement() == 1 else angle
 
 def torch_any(x):
@@ -165,11 +160,10 @@ def torch_bitwise_and(input1, input2):
 
 
 def torch_blackman_window(window_length):
-    # 确保 window_length 是整数类型
     if isinstance(window_length, float):
         window_length = int(window_length)
     elif isinstance(window_length, torch.Tensor):
-        window_length = int(window_length.item())  # 从张量中提取整数值
+        window_length = int(window_length.item())
     
     if not isinstance(window_length, int):
         raise TypeError(f"Expected int for window_length, but got {type(window_length).__name__}")
@@ -177,7 +171,6 @@ def torch_blackman_window(window_length):
     return torch.blackman_window(window_length)
 
 def torch_bmm(input, mat2):
-    # 确保输入是三维张量
     if input.dim() != 3 or mat2.dim() != 3:
         raise ValueError("Both inputs must be 3D tensors.")
     return torch.bmm(input, mat2)
@@ -186,7 +179,6 @@ def torch_broadcast_tensors(*tensors):
     return torch.broadcast_tensors(*tensors)
 
 def torch_broadcast_shapes(shape1, shape2):
-    # 确保 shape1 和 shape2 是整数或整数列表
     if isinstance(shape1, torch.Tensor):
         shape1 = shape1.tolist() if shape1.dim() > 0 else shape1.item()
     if isinstance(shape2, torch.Tensor):
@@ -265,10 +257,8 @@ def torch_complex(real, imag, *, out=None):
 
 
 def torch_concat(tensors, dim=0):
-    # 确保 tensors 是 torch.Tensor 的列表或元组
     tensors = [torch.tensor(tensor) if not isinstance(tensor, torch.Tensor) else tensor for tensor in tensors]
     
-    # 确保 dim 是整数类型
     if isinstance(dim, torch.Tensor):
         dim = int(dim.item())
     
@@ -332,7 +322,6 @@ def torch_dist(input, other, p=2, out=None):
     return torch.dist(input, other, p=p, out=out)
 
 def torch_adaptive_avg_pool1d(input_tensor, output_size):
-    # 确保 output_size 中的元素是整数
     output_size = tuple(int(x) for x in output_size)
     return torch.nn.functional.adaptive_avg_pool1d(input_tensor, output_size)
 
@@ -344,10 +333,10 @@ def torch_adaptive_avg_pool3d(input, output_size):
 
 def torch_adaptive_max_pool1d(input_tensor, output_size):
     if isinstance(output_size, int):
-        output_size = (output_size,)  # 从整数转换为元组
+        output_size = (output_size,)
     elif isinstance(output_size, torch.Tensor):
         if output_size.dtype in [torch.float32, torch.float64]:
-            output_size = tuple(int(x) for x in output_size.tolist())  # 从浮点张量转换为整数元组
+            output_size = tuple(int(x) for x in output_size.tolist())
         else:
             output_size = tuple(output_size.tolist())
     elif not isinstance(output_size, tuple):
@@ -360,7 +349,6 @@ def torch_adaptive_max_pool2d(input, output_size):
 
 
 def torch_adaptive_max_pool3d(input_tensor, output_size):
-    # 转换 output_size 为元组
     if isinstance(output_size, (int, float)):
         output_size = (int(output_size),) * 3
     elif isinstance(output_size, torch.Tensor):
@@ -410,14 +398,13 @@ def torch_celu(input, alpha):
 
 def torch_constant_pad_1d(input, padding, value):
     if isinstance(padding, torch.Tensor):
-        padding = int(padding.item())  # 将 Tensor 转换为整数
+        padding = int(padding.item())
     return torch.nn.functional.pad(input, (padding, padding), mode='constant', value=value)
 
 def torch_constant_pad_2d(input, padding, value):
     return torch.nn.functional.pad(input, (padding, padding, padding, padding), mode='constant', value=value)
 
 def torch_constant_pad_3d(input, padding, value):
-    # 确保 padding 是整数类型，并转换为元组
     if isinstance(padding, torch.Tensor):
         padding = int(padding.item())
     padding_tuple = (padding, padding, padding, padding, padding, padding)
@@ -425,16 +412,13 @@ def torch_constant_pad_3d(input, padding, value):
     return torch.nn.functional.pad(input, padding_tuple, mode='constant', value=value)
 
 def torch_conv1d(input, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True):
-    # 确保输入张量是 3 维的
     if input.dim() != 3:
         raise ValueError("Input tensor must be 3D (batch_size, in_channels, length)")
     
     in_channels = input.shape[1]
     
-    # 创建 Conv1d 模块
     conv1d = torch.nn.Conv1d(in_channels, out_channels, kernel_size, stride=stride, padding=padding, dilation=dilation, groups=groups, bias=bias)
     
-    # 确保输入和输出的匹配
     return conv1d(input)
 
 def torch_conv2d(input, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True):
@@ -443,16 +427,13 @@ def torch_conv2d(input, out_channels, kernel_size, stride=1, padding=0, dilation
     return conv2d(input)
 
 def torch_conv3d(input, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True):
-    # 检查输入张量是否是五维
     if input.dim() != 5:
         raise ValueError("Input tensor must be 5D (batch_size, in_channels, depth, height, width)")
     
     in_channels = input.shape[1]
     
-    # 创建 Conv3d 模块
     conv3d = torch.nn.Conv3d(in_channels, out_channels, kernel_size, stride=stride, padding=padding, dilation=dilation, groups=groups, bias=bias)
 
-    # 返回卷积操作的结果
     return conv3d(input)
 
 def nn_torch_adaptive_avg_pool1d(input_tensor, output_size):
@@ -649,7 +630,6 @@ def nn_torch_max_unpool3d(input, indices, kernel_size, stride=None, padding=0, o
     return nn.functional.max_unpool3d(input, indices, kernel_size, stride=stride, padding=padding, output_size=output_size)
 
 def nn_torch_mish(input):
-    # Mish activation function
     return input * torch.tanh(nn.functional.softplus(input))
 
 def nn_torch_mse_loss(input, target, reduction='mean'):

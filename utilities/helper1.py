@@ -10,7 +10,6 @@ from utilities.counters import Counter
 from utilities.summary import summarize_results
 from outputs.output_strategy import compare_results
 
-# Set up logging to file
 logging.basicConfig(filename='debug.log', level=logging.DEBUG, format='%(asctime)s %(message)s')
 
 counters = Counter()

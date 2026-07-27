@@ -1,14 +1,3 @@
-"""Compare API matching strategies on installed libraries.
-
-The experiment is deliberately small and reproducible:
-
-* mine callable APIs from installed DL libraries;
-* compare raw-name, alias-name, category-aware, and role/doc-aware candidate grouping;
-* dynamically validate a set of high-value equivalence classes.
-
-The dynamic validation stage is the important part: it turns a high-recall
-candidate group into an executable equivalence claim.
-"""
 
 from __future__ import annotations
 
@@ -24,7 +13,7 @@ from typing import Any, Callable, Optional
 
 try:
     from .api_match_common import CATEGORY_TERMS, NAMESPACES, normalize_name, parameter_roles, role_jaccard
-except ImportError:  # pragma: no cover - allows running as a plain script.
+except ImportError:
     from api_match_common import CATEGORY_TERMS, NAMESPACES, normalize_name, parameter_roles, role_jaccard
 
 import numpy as np
@@ -451,8 +440,6 @@ def pair_confidence(left: Api, right: Api) -> float:
         role_score = max(role_score, 0.45)
     arity_score = arity_similarity(left.arity, right.arity)
     base_score = 0.35 * name_score + 0.20 * category_score + 0.30 * role_score + 0.15 * arity_score
-    # Documentation text is noisy across frameworks, so it is treated as positive
-    # evidence only. It can raise confidence but should not reject a match.
     doc_bonus = min(0.08, max(0.0, doc_similarity(left, right) - 0.10) * 0.16)
     return min(1.0, base_score + doc_bonus)
 

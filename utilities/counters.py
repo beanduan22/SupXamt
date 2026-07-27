@@ -19,7 +19,6 @@ class Counter:
         }
 
 def save_counters(counters, file_path):
-    # 确保输出目录存在
     output_dir = os.path.dirname(file_path)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)

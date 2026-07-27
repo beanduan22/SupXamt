@@ -1,4 +1,3 @@
-"""Build a clean source archive for the Xamt++ artifact."""
 
 from __future__ import annotations
 

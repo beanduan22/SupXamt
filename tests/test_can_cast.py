@@ -5,8 +5,6 @@ from functions.torch_functions import torch_can_cast
 from functions.tf_functions import tf_can_cast
 
 api_functions = {
-    # "pytorch_can_cast": torch_can_cast,
-    # "tensorflow_can_cast": tf_can_cast,
 }
 
 @given(input_data=generate_can_cast_inputs())

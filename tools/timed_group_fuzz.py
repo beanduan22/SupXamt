@@ -1,10 +1,3 @@
-"""Timed fuzzing over adapter-validated cross-framework API groups.
-
-This runner reuses the executable adapters in diff_static_candidate_groups and
-refreshes their shared canonical inputs before each execution. It is meant for
-measuring how many matched groups remain consistent under a timed per-group
-budget, not for replacing the main adapter-aware validation pipeline.
-"""
 
 from __future__ import annotations
 
@@ -19,7 +12,7 @@ import numpy as np
 try:
     from .compare_api_matchers import collect_apis, confidence_band, group_confidence
     from . import diff_static_candidate_groups as runner
-except ImportError:  # pragma: no cover - allows running as a plain script.
+except ImportError:
     from compare_api_matchers import collect_apis, confidence_band, group_confidence
     import diff_static_candidate_groups as runner
 

@@ -5,7 +5,6 @@ import numpy as np
 from hypothesis import given, settings
 import hypothesis.strategies as st
 
-# PyTorch
 def torch_arcsin(x):
     return torch.asin(x)
 
@@ -33,7 +32,6 @@ def torch_asinh(x):
 def torch_assert(condition, message):
     assert condition.item(), message
 
-# TensorFlow
 def tf_arcsin(x):
     return tf.asin(x)
 
@@ -61,7 +59,6 @@ def tf_asinh(x):
 def tf_assert(condition, message):
     assert tf.reduce_all(condition), message
 
-# JAX
 def jax_arcsin(x):
     return jnp.arcsin(x)
 
@@ -89,16 +86,13 @@ def jax_asinh(x):
 def jax_assert(condition, message):
     assert jnp.all(condition), message
 
-# 使用Hypothesis进行fuzzing测试
 @given(x=st.floats(min_value=-1.0, max_value=1.0))
 @settings(deadline=None)
 def test_arcsin_functions(x):
-    # 计算各个框架的输出结果
     torch_output = torch_arcsin(torch.tensor(x))
     tf_output = tf_arcsin(x)
     jax_output = jax_arcsin(x)
     
-    # 检查是否一致，如果不一致则打印结果
     if not torch_output == tf_output == jax_output:
         print("Inconsistent result found!")
         print("Input:", x)
@@ -107,8 +101,6 @@ def test_arcsin_functions(x):
         print("JAX Output:", jax_output)
         print()
 
-# 更多测试函数...
 
-# 运行测试
 if __name__ == "__main__":
     test_arcsin_functions()

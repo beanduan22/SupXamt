@@ -1,9 +1,3 @@
-"""Small semantic-retrieval experiment for API matching.
-
-This uses a locally cached MiniLM model through transformers. It does not call
-any external LLM service. The purpose is to compare name/alias retrieval with a
-language-model embedding retriever on representative API matching targets.
-"""
 
 from __future__ import annotations
 
@@ -14,7 +8,7 @@ from dataclasses import dataclass
 
 try:
     from .api_match_common import NAMESPACES, normalize_name
-except ImportError:  # pragma: no cover - allows running as a plain script.
+except ImportError:
     from api_match_common import NAMESPACES, normalize_name
 
 import numpy as np

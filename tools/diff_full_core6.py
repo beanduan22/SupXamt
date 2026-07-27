@@ -1,8 +1,3 @@
-"""Full executable differential experiment for matched core DL APIs.
-
-Runs the executable adapter set for six frameworks. Static matches are not counted
-as differential-testable until an adapter can call them with aligned semantics.
-"""
 
 from __future__ import annotations
 

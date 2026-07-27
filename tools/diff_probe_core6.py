@@ -1,9 +1,3 @@
-"""Run differential probes across six DL frameworks.
-
-The probe is intentionally small: it targets matched API groups that are likely
-to expose semantic differences on boundary inputs. Paddle and MindSpore run in
-separate subprocesses because their native libraries conflict in one process.
-"""
 
 from __future__ import annotations
 

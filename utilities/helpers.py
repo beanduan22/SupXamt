@@ -10,7 +10,6 @@ from utilities.counters import Counter
 from utilities.summary import summarize_results
 from outputs.output_strategy import compare_results
 
-# Set up logging to file
 logging.basicConfig(filename='debug.log', level=logging.DEBUG, format='%(asctime)s %(message)s')
 
 counters = Counter()
@@ -23,7 +22,7 @@ def convert_input(input_data, api_name):
     logging.debug(f"Original input for {api_name}: {input_data}")
     if api_name.startswith("pytorch"):
         if isinstance(input_data, torch.Tensor):
-            return input_data.clone().detach().type(torch.float32)  # 明确指定类型
+            return input_data.clone().detach().type(torch.float32)
         return torch.tensor(input_data, dtype=torch.float32)
     elif api_name.startswith("tensorflow"):
         if isinstance(input_data, torch.Tensor):
@@ -48,7 +47,6 @@ def convert_input(input_data, api_name):
     return input_data
 
 def run_test(file_name, input_data, api_functions):
-    # Handle both single and multiple inputs
     if isinstance(input_data, (list, tuple)):
         inputs = input_data
     else:
@@ -78,7 +76,6 @@ def run_test(file_name, input_data, api_functions):
 
     log_results(file_name, input_data, results)
     
-    # 获取 PyTorch 结果并进行比较
     pytorch_result = None
     for api_name, data in results.items():
         if "pytorch" in api_name:
@@ -86,7 +83,7 @@ def run_test(file_name, input_data, api_functions):
             break
     
     if pytorch_result is None:
-        return  # 如果 PyTorch 结果不存在，直接返回
+        return
 
     test_passed = True
     for api_name, data in results.items():

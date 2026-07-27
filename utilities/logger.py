@@ -1,4 +1,3 @@
-# utilities/logger.py
 import os
 import json
 from datetime import datetime
@@ -7,13 +6,13 @@ import numpy as np
 def serialize(obj):
     if isinstance(obj, (np.ndarray, np.generic)):
         return obj.tolist()
-    if hasattr(obj, 'numpy'):  # TensorFlow tensor
+    if hasattr(obj, 'numpy'):
         return obj.numpy().tolist()
-    if hasattr(obj, 'tolist'):  # PyTorch tensor或其他数组类
+    if hasattr(obj, 'tolist'):
         return obj.tolist()
-    if hasattr(obj, 'data'):  # Chainer Variable
+    if hasattr(obj, 'data'):
         return obj.data.tolist()
-    return str(obj)  # 最后手段，将对象转换为字符串
+    return str(obj)
 
 def ensure_directory_exists(path):
     if not os.path.exists(os.path.dirname(path)):
@@ -37,7 +36,6 @@ def log_execution_details(file_name, results_log, avg_exec_times, summary):
     with open(log_path, 'a') as f:
         json.dump(log_data, f, indent=4, default=serialize)
 
-    # Record summary information
     log_summary = {
         "Execution File": file_name,
         "Time": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),

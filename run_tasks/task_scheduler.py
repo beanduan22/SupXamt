@@ -2,7 +2,6 @@ import subprocess
 import sys
 import os
 
-# List of test files to be executed in order
 test_files = [
     "tests/test_abs.py",
     "tests/test_absolute.py",

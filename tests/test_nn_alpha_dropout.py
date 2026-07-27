@@ -4,7 +4,6 @@ from utilities.helpers import run_test, finalize_results
 from functions.torch_functions import nn_torch_alpha_dropout
 from functions.tf_functions import nn_tf_alpha_dropout
 from functions.keras_functions import nn_keras_alpha_dropout
-# Chainer and JAX may not have a direct equivalent for alpha dropout; use regular dropout for demonstration
 from functions.chainer_functions import nn_chainer_dropout
 from functions.jax_functions import nn_jax_dropout
 

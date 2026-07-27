@@ -1,4 +1,3 @@
-# test_adaptive_max_pool3d.py
 from hypothesis import given, settings
 from inputs.input_generator import generate_adaptive_max_pool3d_inputs
 from utilities.helpers import run_test, finalize_results

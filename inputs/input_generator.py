@@ -63,7 +63,7 @@ def add_input_strategy():
 def addbmm_input_strategy():
     float_strategy = st.floats(min_value=-10, max_value=10, allow_infinity=False, allow_nan=False, width=32)
     return st.tuples(
-        st.arrays(dtype=np.float32, shape=(1, 3, 3), elements=float_strategy),  # 确保A是三维的
+        st.arrays(dtype=np.float32, shape=(1, 3, 3), elements=float_strategy),
         st.arrays(dtype=np.float32, shape=(1, 3, 3), elements=float_strategy),
         st.arrays(dtype=np.float32, shape=(1, 3, 3), elements=float_strategy)
     ).map(lambda x: (torch.tensor(x[0]), torch.tensor(x[1]), torch.tensor(x[2])))
@@ -81,13 +81,12 @@ def addcdiv_input_strategy():
 def addbmm_input_strategy():
     float_strategy = st.floats(min_value=-10, max_value=10, allow_infinity=False, allow_nan=False, width=32)
     return st.tuples(
-        arrays(dtype=np.float32, shape=(3, 3), elements=float_strategy),  # C tensor
-        arrays(dtype=np.float32, shape=(3, 3, 3), elements=float_strategy),  # A tensor
-        arrays(dtype=np.float32, shape=(3, 3, 3), elements=float_strategy)   # B tensor
+        arrays(dtype=np.float32, shape=(3, 3), elements=float_strategy),
+        arrays(dtype=np.float32, shape=(3, 3, 3), elements=float_strategy),
+        arrays(dtype=np.float32, shape=(3, 3, 3), elements=float_strategy)
     ).map(lambda x: (torch.tensor(x[0]), torch.tensor(x[1]), torch.tensor(x[2])))
     
 def addcmul_input_strategy():
-    # Generates input data with tensors having matching dimensions and a scalar
     regular_floats = st.floats(min_value=-10, max_value=10, width=32)
     return st.tuples(
         st.lists(regular_floats, min_size=5, max_size=5).map(lambda x: torch.tensor(x, dtype=torch.float32)),
@@ -99,15 +98,15 @@ def addcmul_input_strategy():
 def generate_addmm_inputs():
     float_strategy = st.floats(min_value=-1e38, max_value=1e38, allow_nan=False, allow_infinity=False)
     return st.tuples(
-        float_strategy,  # beta
-        float_strategy,  # alpha
-        st.lists(st.lists(float_strategy, min_size=4, max_size=4), min_size=3, max_size=3).map(np.array),  # A
-        st.lists(st.lists(float_strategy, min_size=5, max_size=5), min_size=4, max_size=4).map(np.array)   # B
+        float_strategy,
+        float_strategy,
+        st.lists(st.lists(float_strategy, min_size=4, max_size=4), min_size=3, max_size=3).map(np.array),
+        st.lists(st.lists(float_strategy, min_size=5, max_size=5), min_size=4, max_size=4).map(np.array)
     ).map(lambda x: (
-        x[0],  # beta, as scalar
-        x[1],  # alpha, as scalar
-        torch.tensor(x[2], dtype=torch.float32),  # A, 3x4 matrix
-        torch.tensor(x[3], dtype=torch.float32)   # B, 4x5 matrix
+        x[0],
+        x[1],
+        torch.tensor(x[2], dtype=torch.float32),
+        torch.tensor(x[3], dtype=torch.float32)
     ))
     
 def generate_addmv_inputs():
@@ -159,22 +158,17 @@ def generate_amin_inputs():
     ))
     
 def generate_angle_inputs():
-    # 使用 Hypothesis 生成单个复数输入
     return st.tuples(
         st.floats(min_value=-100, max_value=100, allow_nan=False, allow_infinity=False),
         st.floats(min_value=-100, max_value=100, allow_nan=False, allow_infinity=False)
     ).map(lambda real_imag: (
-        torch.tensor(complex(real_imag[0], real_imag[1]), dtype=torch.cfloat),  # 生成单个复数的张量，正确包括一个实部和一个虚部
-        # jnp.array(complex(real_imag[0], real_imag[1]), dtype=jnp.complex64)     # 生成单个复数的数组，正确包括一个实部和一个虚部
+        torch.tensor(complex(real_imag[0], real_imag[1]), dtype=torch.cfloat),
     ))
     
 def generate_any_inputs():
     bool_strategy = st.booleans()
     return bool_strategy.map(lambda x: (
         torch.tensor(x),
-        # tf.convert_to_tensor(x),
-        # tf.convert_to_tensor(x),
-        # jnp.array(x)
     ))
     
 def generate_arange_inputs():
@@ -259,7 +253,7 @@ def generate_baddbmm_inputs():
 
 def generate_bartlett_window_inputs():
     window_length_strategy = st.integers(min_value=1, max_value=100)
-    dtype_strategy = st.sampled_from([torch.float32, torch.float64])  # 移除 None，避免传递无效的 dtype
+    dtype_strategy = st.sampled_from([torch.float32, torch.float64])
     return st.tuples(window_length_strategy, dtype_strategy)
 
 def generate_bernoulli_inputs():
@@ -314,8 +308,8 @@ def generate_blackman_window_inputs():
 
 def generate_bmm_inputs():
     return st.tuples(
-        st.lists(st.lists(st.lists(st.floats(min_value=-1e6, max_value=1e6), min_size=2, max_size=2), min_size=2, max_size=2), min_size=1, max_size=1),  # 生成三维张量数据
-        st.lists(st.lists(st.lists(st.floats(min_value=-1e6, max_value=1e6), min_size=2, max_size=2), min_size=2, max_size=2), min_size=1, max_size=1)  # 生成三维张量数据
+        st.lists(st.lists(st.lists(st.floats(min_value=-1e6, max_value=1e6), min_size=2, max_size=2), min_size=2, max_size=2), min_size=1, max_size=1),
+        st.lists(st.lists(st.lists(st.floats(min_value=-1e6, max_value=1e6), min_size=2, max_size=2), min_size=2, max_size=2), min_size=1, max_size=1)
     )
 
 def generate_broadcast_tensors_inputs():
@@ -343,12 +337,11 @@ def generate_broadcast_to_inputs():
 
 def generate_bucketize_inputs():
     input_strategy = st.lists(st.floats(min_value=-1e38, max_value=1e38, allow_nan=False, allow_infinity=False), min_size=1)
-    boundaries_strategy = st.lists(st.floats(min_value=-1e38, max_value=1e38, allow_nan=False, allow_infinity=False), min_size=1).map(sorted)  # 确保边界值有序
+    boundaries_strategy = st.lists(st.floats(min_value=-1e38, max_value=1e38, allow_nan=False, allow_infinity=False), min_size=1).map(sorted)
     return st.tuples(input_strategy, boundaries_strategy)
 
 def generate_can_cast_inputs():
     from_dtype = st.sampled_from([torch.float32, torch.int32])
-    # to_dtype = st.sampled_from([torch.float64, torch.int64])
     return st.tuples(from_dtype)
 
 def generate_can_cast_inputs():
@@ -380,22 +373,18 @@ def generate_char_storage_inputs():
 
 def generate_cholesky_inverse_inputs():
     def create_positive_definite_matrix(size):
-        # 生成随机矩阵
         A = np.random.rand(size, size)
-        # 确保生成的矩阵是正定矩阵
         return np.dot(A, A.T)
 
-    matrix_size_strategy = st.integers(min_value=2, max_value=10)  # 定义矩阵大小
+    matrix_size_strategy = st.integers(min_value=2, max_value=10)
     return matrix_size_strategy.map(lambda size: torch.tensor(create_positive_definite_matrix(size), dtype=torch.float32))
 
 def generate_cholesky_inputs():
     def create_positive_definite_matrix(size):
-        # 生成随机矩阵
         A = np.random.rand(size, size)
-        # 确保生成的矩阵是正定矩阵
         return np.dot(A, A.T)
 
-    matrix_size_strategy = st.integers(min_value=2, max_value=10)  # 定义矩阵大小
+    matrix_size_strategy = st.integers(min_value=2, max_value=10)
     return matrix_size_strategy.map(lambda size: torch.tensor(create_positive_definite_matrix(size), dtype=torch.float32))
 
 def generate_cholesky_solve_inputs():
@@ -407,7 +396,7 @@ def generate_cholesky_solve_inputs():
 def generate_chunk_inputs():
     tensor_strategy = st.lists(st.floats(min_value=-1e6, max_value=1e6), min_size=1).map(lambda x: torch.tensor(x))
     chunks_strategy = st.integers(min_value=1, max_value=10)
-    dim_strategy = st.integers(min_value=0, max_value=1)  # Assuming 1D or 2D tensors for simplicity
+    dim_strategy = st.integers(min_value=0, max_value=1)
     return st.tuples(tensor_strategy, chunks_strategy, dim_strategy)
 
 def generate_clamp_inputs():
@@ -561,7 +550,7 @@ def generate_dist_inputs():
 def generate_adaptive_avg_pool1d_inputs():
     return st.tuples(
         st.lists(st.floats(min_value=-1e3, max_value=1e3), min_size=1).map(lambda x: torch.tensor(x).unsqueeze(0).unsqueeze(-1)),
-        st.tuples(st.integers(min_value=1, max_value=100).filter(lambda x: x > 0))  # 确保output_size大于0
+        st.tuples(st.integers(min_value=1, max_value=100).filter(lambda x: x > 0))
     )
 
 def generate_adaptive_avg_pool2d_inputs():
@@ -590,10 +579,8 @@ def generate_adaptive_max_pool2d_inputs():
 
 def generate_adaptive_max_pool3d_inputs():
     return st.tuples(
-        # 生成五维张量，确保只有一个维度用 -1 来推断
-        st.lists(st.floats(min_value=-1e6, max_value=1e6), min_size=125, max_size=125)  # 5*5*5=125
-            .map(lambda x: torch.tensor(x).view(1, 1, 5, 5, 5)),  # 5x5x5 三维数据
-        # 生成输出尺寸的元组
+        st.lists(st.floats(min_value=-1e6, max_value=1e6), min_size=125, max_size=125)
+            .map(lambda x: torch.tensor(x).view(1, 1, 5, 5, 5)),
         st.integers(min_value=1, max_value=10).map(lambda x: (x, x, x))
     )
     
@@ -606,9 +593,9 @@ def generate_alpha_dropout_inputs():
 def generate_avg_pool1d_inputs():
     return st.tuples(
         st.lists(st.floats(min_value=-1e6, max_value=1e6), min_size=10).map(lambda x: torch.tensor(x, dtype=torch.float32).unsqueeze(0).unsqueeze(-1)),
-        st.integers(min_value=1, max_value=5).map(int),  # 确保 kernel_size 为整数
-        st.integers(min_value=1, max_value=5).map(int),  # 确保 stride 为整数
-        st.sampled_from(['valid', 'same'])              # 确保 padding 是字符串
+        st.integers(min_value=1, max_value=5).map(int),
+        st.integers(min_value=1, max_value=5).map(int),
+        st.sampled_from(['valid', 'same'])
     )
 
 def generate_avg_pool2d_inputs():
@@ -739,10 +726,8 @@ def generate_conv3d_inputs():
 
 import numpy as np
 
-# 固定随机种子以确保一致性
 np.random.seed(0)
 
-# Pooling layers
 def generate_nn_adaptive_avg_pool1d_input(batch_size=1, channels=3, length=64):
     return np.random.rand(batch_size, channels, length).astype(np.float32)
 
@@ -752,11 +737,9 @@ def generate_nn_adaptive_avg_pool2d_input(batch_size=1, channels=3, height=64, w
 def generate_nn_adaptive_avg_pool3d_input(batch_size=1, channels=3, depth=64, height=64, width=64):
     return np.random.rand(batch_size, channels, depth, height, width).astype(np.float32)
 
-# Dropout
 def generate_nn_alpha_dropout_input(batch_size=1, features=256):
     return np.random.rand(batch_size, features).astype(np.float32)
 
-# Average Pooling
 def generate_nn_avg_pool1d_input(batch_size=1, channels=3, length=64):
     return np.random.rand(batch_size, channels, length).astype(np.float32)
 
@@ -766,7 +749,6 @@ def generate_nn_avg_pool2d_input(batch_size=1, channels=3, height=64, width=64):
 def generate_nn_avg_pool3d_input(batch_size=1, channels=3, depth=64, height=64, width=64):
     return np.random.rand(batch_size, channels, depth, height, width).astype(np.float32)
 
-# Batch Normalization
 def generate_nn_batch_norm1d_input(num_features, batch_size=1, length=64):
     return np.random.rand(batch_size, num_features, length).astype(np.float32)
 
@@ -776,7 +758,6 @@ def generate_nn_batch_norm2d_input(num_features, batch_size=1, height=64, width=
 def generate_nn_batch_norm3d_input(num_features, batch_size=1, depth=64, height=64, width=64):
     return np.random.rand(batch_size, num_features, depth, height, width).astype(np.float32)
 
-# Binary Cross Entropy Loss
 def generate_nn_bce_loss_input(batch_size=1, features=256):
     inputs = np.random.rand(batch_size, features).astype(np.float32)
     targets = np.random.randint(0, 2, (batch_size, features)).astype(np.float32)
@@ -922,14 +903,12 @@ def generate_lp_pool2d_input():
     kernel_size = (3, 3)
     return input_data, kernel_size
 
-# Margin Ranking Loss
 def generate_margin_ranking_loss_input():
     input1 = np.random.rand(10, 5).astype(np.float32)
     input2 = np.random.rand(10, 5).astype(np.float32)
-    target = np.random.randint(0, 2, size=(10,)).astype(np.float32)  # 0 or 1 targets
+    target = np.random.randint(0, 2, size=(10,)).astype(np.float32)
     return input1, input2, target
 
-# Max Pooling 1D
 def generate_max_pool1d_input():
     input = np.random.rand(1, 3, 10).astype(np.float32)
     kernel_size = 2
@@ -937,7 +916,6 @@ def generate_max_pool1d_input():
     padding = 0
     return input, kernel_size, stride, padding
 
-# Max Pooling 2D
 def generate_max_pool2d_input():
     input = np.random.rand(1, 3, 10, 10).astype(np.float32)
     kernel_size = (2, 2)
@@ -945,7 +923,6 @@ def generate_max_pool2d_input():
     padding = 0
     return input, kernel_size, stride, padding
 
-# Max Pooling 3D
 def generate_max_pool3d_input():
     input = np.random.rand(1, 3, 10, 10, 10).astype(np.float32)
     kernel_size = (2, 2, 2)
@@ -953,7 +930,6 @@ def generate_max_pool3d_input():
     padding = 0
     return input, kernel_size, stride, padding
 
-# Max Unpooling 1D
 def generate_max_unpool1d_input():
     input = np.random.rand(1, 3, 10).astype(np.float32)
     indices = np.random.randint(0, 10, size=(1, 3, 10)).astype(np.int64)
@@ -963,7 +939,6 @@ def generate_max_unpool1d_input():
     output_size = (1, 3, 10)
     return input, indices, kernel_size, stride, padding, output_size
 
-# Max Unpooling 2D
 def generate_max_unpool2d_input():
     input = np.random.rand(1, 3, 10, 10).astype(np.float32)
     indices = np.random.randint(0, 10, size=(1, 3, 10, 10)).astype(np.int64)
@@ -973,7 +948,6 @@ def generate_max_unpool2d_input():
     output_size = (1, 3, 10, 10)
     return input, indices, kernel_size, stride, padding, output_size
 
-# Max Unpooling 3D
 def generate_max_unpool3d_input():
     input = np.random.rand(1, 3, 10, 10, 10).astype(np.float32)
     indices = np.random.randint(0, 10, size=(1, 3, 10, 10, 10)).astype(np.int64)
@@ -983,24 +957,20 @@ def generate_max_unpool3d_input():
     output_size = (1, 3, 10, 10, 10)
     return input, indices, kernel_size, stride, padding, output_size
 
-# Mish
 def generate_mish_input():
     return np.random.rand(1, 3, 10, 10).astype(np.float32)
 
-# MSE Loss
 def generate_mse_loss_input():
     input = np.random.rand(10, 5).astype(np.float32)
     target = np.random.rand(10, 5).astype(np.float32)
     return input, target
 
-# Multilabel Margin Loss
 def generate_multilabel_margin_loss_input():
     input = np.random.rand(10, 5).astype(np.float32)
-    target = np.random.randint(0, 2, size=(10, 5)).astype(np.float32)  # 0 or 1 targets
+    target = np.random.randint(0, 2, size=(10, 5)).astype(np.float32)
     return input, target
 
-# Multilabel Soft Margin Loss
 def generate_multilabel_soft_margin_loss_input():
     input = np.random.rand(10, 5).astype(np.float32)
-    target = np.random.randint(0, 2, size=(10, 5)).astype(np.float32)  # 0 or 1 targets
+    target = np.random.randint(0, 2, size=(10, 5)).astype(np.float32)
     return input, target

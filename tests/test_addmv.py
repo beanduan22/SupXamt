@@ -11,7 +11,6 @@ api_functions = {
     "pytorch_addmv": torch_addmv,
     "tensorflow_addmv": tf_addmv,
     "chainer_addmv": chainer_addmv,
-    # "keras_addmv": keras_addmv,
     "jax_addmv": jax_addmv,
 }
 

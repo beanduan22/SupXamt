@@ -40,7 +40,6 @@ def safe_divide(x1, x2, epsilon=1e-8):
     safe_x2 = x2_data + (np.isclose(x2_data, 0.0) * epsilon)
     safe_division_result = x1_data / safe_x2
     
-    # 确保结果数据类型与输入一致
     if isinstance(x1, chainer.Variable):
         return chainer.as_variable(safe_division_result.astype(x1_data.dtype))
     elif isinstance(x2, chainer.Variable):
@@ -53,22 +52,19 @@ def chainer_addcdiv(t, x1, x2, value=1):
     return t + value * safe_division_result
 
 def chainer_addcmul(input_array, tensor1, tensor2, value=1.0):
-    # Ensure all inputs are numpy arrays of the same dtype and shape
     input_array = np.asarray(input_array, dtype=np.float32)
     tensor1 = np.asarray(tensor1, dtype=np.float32)
     tensor2 = np.asarray(tensor2, dtype=np.float32)
 
-    # Check that all inputs are 1D arrays of the same length
     if input_array.ndim != 1 or tensor1.ndim != 1 or tensor2.ndim != 1:
         raise ValueError("All inputs must be 1D arrays")
     if len(input_array) != len(tensor1) or len(tensor1) != len(tensor2):
         raise ValueError("All inputs must be the same length")
 
-    # Performing the element-wise multiplication using numpy
     product = np.multiply(tensor1, tensor2)
     result = input_array + value * product
 
-    return result  # Return as numpy array
+    return result
 
 def chainer_addmv(x, y, z, beta=1, alpha=1):
     return beta * x + alpha * F.matmul(y, z)
@@ -161,7 +157,6 @@ def chainer_broadcast_tensors(*tensors):
     return chainer.functions.broadcast(*[np.array(tensor) for tensor in tensors])
 
 def chainer_broadcast_shapes(shape1, shape2):
-    # 使用 NumPy 计算广播形状
     shape1 = np.array(shape1)
     shape2 = np.array(shape2)
     result_shape = np.broadcast(shape1, shape2).shape
@@ -172,7 +167,6 @@ def chainer_broadcast_to(input_tensor, size):
 
 
 def chainer_bucketize(input_tensor, boundaries):
-    # 使用 NumPy 的 digitize 函数
     boundaries = np.array(boundaries)
     return np.digitize(input_tensor, bins=boundaries)
 
@@ -189,9 +183,8 @@ def chainer_chain_matmul(*matrices):
     return F.matmul(*matrices)
 
 def chainer_cholesky_inverse(input, upper=False):
-    # 手动实现 Cholesky 逆矩阵计算
-    L = F.cholesky(input)  # 使用 Cholesky 分解
-    L_inv = np.linalg.inv(L.array)  # 使用 NumPy 计算逆矩阵
+    L = F.cholesky(input)
+    L_inv = np.linalg.inv(L.array)
     return L_inv @ L_inv.T if not upper else L_inv.T @ L_inv
 
 def chainer_cholesky(input):
@@ -210,19 +203,16 @@ def chainer_stack(tensors, axis=1):
     return F.stack(tensors, axis=axis)
 
 def chainer_complex(real, imag):
-    # Assuming this function exists in Chainer for demonstration purposes
     return F.complex(real, imag)
 
 def chainer_concat(tensors, axis=0):
-    tensors = [np.array(tensor) for tensor in tensors]  # 确保是 numpy 数组
+    tensors = [np.array(tensor) for tensor in tensors]
     return F.concat(tensors, axis=axis)
 
 def chainer_conj(input):
-    # 使用 NumPy 实现复数共轭
     input_np = input.array if isinstance(input, chainer.Variable) else input
     conj_result = np.conj(input_np)
     
-    # 如果输入是 Chainer 的 Variable 对象，返回 Variable 对象
     if isinstance(input, chainer.Variable):
         return chainer.Variable(conj_result)
     
@@ -290,7 +280,7 @@ def chainer_adaptive_avg_pool3d(input, output_size):
 
 def chainer_adaptive_max_pool1d(input_tensor, output_size):
     if isinstance(output_size, int):
-        output_size = (output_size,)  # 将整数转换为元组
+        output_size = (output_size,)
 
     kernel_size = input_tensor.shape[2] // output_size[0]
     stride = kernel_size
@@ -302,7 +292,7 @@ def chainer_adaptive_max_pool2d(input, output_size):
 
 def chainer_adaptive_max_pool3d(input_tensor, output_size):
     if isinstance(output_size, int):
-        output_size = (output_size, output_size, output_size)  # 转为元组
+        output_size = (output_size, output_size, output_size)
     if not isinstance(output_size, tuple):
         raise TypeError("output_size must be a tuple")
 
@@ -314,7 +304,6 @@ def chainer_adaptive_max_pool3d(input_tensor, output_size):
     return F.max_pooling_nd(input_tensor, ksize=kernel_size, stride=kernel_size)
 
 def chainer_avg_pool1d(input, kernel_size, stride=None, padding=0):
-    # Chainer 的平均池化，移除了不支持的 cover_all 参数
     return F.average_pooling_1d(input, kernel_size, stride=stride, pad=padding)
 
 def chainer_avg_pool2d(input, kernel_size, stride=None, padding=0, ceil_mode=False):
@@ -338,14 +327,11 @@ def chainer_celu(input, alpha=1.0):
     return F.celu(input, alpha=alpha)
 
 def chainer_constant_pad_1d(input, padding, value):
-    # 确保 padding 是整数
     if isinstance(padding, (float, np.float32, np.float64, chainer.Variable)):
         padding = int(padding)
 
-    # 输入假设为 1D 张量，pad_width 应设置为 (padding_left, padding_right)
     pad_width = (padding, padding)
     
-    # 使用 NumPy 的 np.pad 进行填充操作
     input_np = input.array if isinstance(input, chainer.Variable) else input
     padded_input = np.pad(input_np, pad_width=pad_width, mode='constant', constant_values=value)
     
@@ -355,14 +341,11 @@ def chainer_constant_pad_2d(input, padding, value):
     return F.pad(input, pad_width=[(0, 0), (padding, padding), (padding, padding)], mode='constant', constant_values=value)
 
 def chainer_constant_pad_3d(input, padding, value):
-    # 确保 padding 是整数类型
     if isinstance(padding, (float, np.float32, np.float64)):
         padding = int(padding)
     
-    # 输入假设为 3D 张量
     pad_width = [(0, 0), (padding, padding), (padding, padding), (padding, padding)]
     
-    # 使用 NumPy 的 np.pad 进行填充操作
     input_np = input.array if isinstance(input, chainer.Variable) else input
     padded_input = np.pad(input_np, pad_width=pad_width, mode='constant', constant_values=value)
     
@@ -382,7 +365,6 @@ def chainer_conv2d(input, out_channels, kernel_size, stride=1, padding=0, dilati
     return conv2d(input)
 
 def chainer_conv3d(input, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True):
-    # 检查输入张量是否是五维
     if input.ndim != 5:
         raise ValueError("Input tensor must be 5D (batch_size, in_channels, depth, height, width)")
     
@@ -418,7 +400,6 @@ def nn_chainer_average_pooling3d(input_tensor, kernel_size, stride, padding):
     return F.average_pooling_3d(input_tensor, kernel_size, stride=stride, pad=padding)
 
 def nn_chainer_batch_normalization(input_tensor, num_features, eps, decay):
-    # Chainer uses decay instead of momentum, and a link (L.BatchNormalization) rather than a function
     bn_layer = L.BatchNormalization(num_features, eps=eps, decay=decay)
     return bn_layer(input_tensor)
 
@@ -429,7 +410,6 @@ def nn_chainer_celu(input_tensor, alpha):
     return F.celu(input_tensor, alpha)
 
 def nn_chainer_constant_pad1d(input, padding, value):
-    # Chainer's F.pad only works with numpy arrays, not chainer variables
     return F.pad(input, ((0, 0), (0, 0), padding), mode='constant', constant_values=value)
 
 def nn_chainer_constant_pad2d(input, padding, value):

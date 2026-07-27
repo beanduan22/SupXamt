@@ -7,7 +7,6 @@ from functions.keras_functions import keras_addbmm
 from functions.jax_functions import jax_addbmm
 
 api_functions = {
-    # "pytorch_addbmm": torch_addbmm,
     "tensorflow_addbmm": tf_addbmm,
     "keras_addbmm": keras_addbmm,
     "jax_addbmm": jax_addbmm,

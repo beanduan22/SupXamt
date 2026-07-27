@@ -83,7 +83,7 @@ def keras_bitwise_and(input1, input2):
     return tf.bitwise.bitwise_and(input1, input2)
 
 def keras_cat(tensors, axis=0):
-    tensors = [tf.convert_to_tensor(tensor) for tensor in tensors]  # 转换为 TensorFlow 张量
+    tensors = [tf.convert_to_tensor(tensor) for tensor in tensors]
     return tf.keras.backend.concatenate(tensors, axis=axis)
 
 def keras_ceil(input):
@@ -164,7 +164,6 @@ def nn_keras_celu(input_tensor, alpha):
     return keras.layers.Activation('celu', alpha=alpha)(input_tensor)
 
 def nn_keras_constant_pad1d(input, padding, value):
-    # Keras does not have a direct 1D padding, using TensorFlow's function as workaround
     padded = tf.pad(input, [[0, 0], padding, [0, 0]], mode='CONSTANT', constant_values=value)
     return padded[:, :, 0]
 
@@ -172,7 +171,6 @@ def nn_keras_constant_pad2d(input, padding, value):
     return keras.layers.ZeroPadding2D(padding)(input) + value
 
 def nn_keras_constant_pad3d(input, padding, value):
-    # Keras does not support direct 3D padding with constant values, using TensorFlow's function as workaround
     return tf.pad(input, padding, mode='CONSTANT', constant_values=value)
 
 def nn_keras_conv1d(input, filters, kernel_size, strides, padding, dilation_rate, groups, use_bias):

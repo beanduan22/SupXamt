@@ -4,7 +4,6 @@ from utilities.helpers import run_test, finalize_results
 from functions.torch_functions import torch_char_storage
 
 api_functions = {
-    # "pytorch_char_storage": torch_char_storage,
 }
 
 @given(input_data=generate_char_storage_inputs())

@@ -5,16 +5,15 @@ import numpy as np
 def serialize(obj):
     if isinstance(obj, (np.ndarray, np.generic)):
         return obj.tolist()
-    if hasattr(obj, 'numpy'):  # TensorFlow tensor
+    if hasattr(obj, 'numpy'):
         return obj.numpy().tolist()
-    if hasattr(obj, 'tolist'):  # PyTorch tensor或其他数组类
+    if hasattr(obj, 'tolist'):
         return obj.tolist()
-    if hasattr(obj, 'data'):  # Chainer Variable
+    if hasattr(obj, 'data'):
         return obj.data.tolist()
-    return str(obj)  # 最后手段，将对象转换为字符串
+    return str(obj)
 
 def save_summary(summary_data, file_path):
-    # 确保输出目录存在
     output_dir = os.path.dirname(file_path)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)

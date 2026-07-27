@@ -10,7 +10,6 @@ from functions.jax_functions import jax_argmax
 api_functions = {
     "pytorch_argmax": torch_argmax,
     "tensorflow_argmax": tf_argmax,
-    # "chainer_argmax": chainer_argmax,
     "keras_argmax": keras_argmax,
     "jax_argmax": jax_argmax,
 }

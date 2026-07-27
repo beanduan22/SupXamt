@@ -27,9 +27,9 @@ def tf_addcmul(input, tensor1, tensor2, value=1):
 
 
 def tf_addmm(C, A, B, beta=1.0, alpha=1.0):
-    if isinstance(A, (float, int)):  # 确保 A 是张量
+    if isinstance(A, (float, int)):
         A = tf.constant([[A]])
-    if isinstance(B, (float, int)):  # 确保 B 是张量
+    if isinstance(B, (float, int)):
         B = tf.constant([[B]])
     result = tf.linalg.matmul(A, B)
     return beta * C + alpha * result
@@ -82,12 +82,12 @@ def tf_argsort(x):
     return tf.argsort(x)
 
 def tf_strided_slice(x, size, stride):
-    begin = [0] * len(x.shape)  # 确保 begin 的长度与张量维度一致
-    end = [(s - 1) * st + 1 for s, st in zip(size, stride)]  # 计算每个维度的结束索引
+    begin = [0] * len(x.shape)
+    end = [(s - 1) * st + 1 for s, st in zip(size, stride)]
     return tf.strided_slice(x, begin=begin, end=end, strides=stride)
 
 def tf_constant(data):
-    int_data = [int(x) for x in data]  # 将浮点数转换为整数
+    int_data = [int(x) for x in data]
     return tf.constant(int_data, dtype=tf.int32)
 
 def tf_asinh(x):
@@ -115,7 +115,6 @@ def tf_baddbmm(input, batch1, batch2, beta=1, alpha=1):
     return tf.matmul(batch1, batch2) * alpha + input * beta
 
 def tf_bartlett_window(window_length, dtype=tf.float32):
-    # TensorFlow 可能没有直接的 Bartlett window 实现，手动实现
     return 1 - tf.abs((2 * tf.range(window_length, dtype=dtype) / (window_length - 1)) - 1)
 
 def tf_bernoulli(input):
@@ -145,7 +144,6 @@ def tf_bitwise_and(input1, input2):
     return tf.bitwise.bitwise_and(input1, input2)
 
 def tf_blackman_window(window_length):
-    # 使用 NumPy 实现 Blackman 窗口
     window = np.blackman(window_length)
     return tf.convert_to_tensor(window, dtype=tf.float32)
 
@@ -162,7 +160,6 @@ def tf_broadcast_to(input_tensor, size):
     return tf.broadcast_to(input_tensor, size)
 
 def tf_bucketize(input_tensor, boundaries):
-    # 确保 boundaries 是列表或 NumPy 数组，而不是 TensorFlow 张量
     boundaries = boundaries if isinstance(boundaries, (list, np.ndarray)) else boundaries.numpy().tolist()
     return tf.raw_ops.Bucketize(input=input_tensor, boundaries=boundaries)
 
@@ -189,7 +186,6 @@ def tf_chain_matmul(*matrices):
 def tf_cholesky_inverse(input, upper=False):
     cholesky_decomp = tf.linalg.cholesky(input)
     if upper:
-        # 如果希望使用上三角矩阵，则转置 Cholesky 分解结果
         cholesky_decomp = tf.transpose(cholesky_decomp)
     return tf.linalg.cholesky_solve(cholesky_decomp, tf.eye(input.shape[-1]))
 
@@ -215,7 +211,7 @@ def tf_complex(real, imag):
     return tf.complex(real, imag)
 
 def tf_concat(tensors, axis=0):
-    tensors = [tf.convert_to_tensor(tensor) for tensor in tensors]  # 转换为 TensorFlow 张量
+    tensors = [tf.convert_to_tensor(tensor) for tensor in tensors]
     return tf.concat(tensors, axis=axis)
 
 def tf_conj(input):
@@ -285,9 +281,9 @@ def tf_adaptive_avg_pool3d(input, output_size):
     return tf.keras.layers.GlobalAveragePooling3D()(input)
 
 def tf_adaptive_max_pool1d(input_data):
-    input_tensor, output_size = input_data  # 接收两个参数但只用第一个
+    input_tensor, output_size = input_data
     if input_tensor.ndim == 2:
-        input_tensor = input_tensor[:, None, :]  # 添加一个维度
+        input_tensor = input_tensor[:, None, :]
     return tf.keras.layers.GlobalMaxPooling1D()(input_tensor)
 
 def tf_adaptive_max_pool2d(input, output_size):
@@ -300,7 +296,6 @@ def tf_alpha_dropout(input, rate):
     return tf.keras.layers.AlphaDropout(rate=rate)(input)
 
 def tf_avg_pool1d(input, pool_size, strides, padding='valid'):
-    # 确保 padding 参数为字符串
     return tf.keras.layers.AveragePooling1D(pool_size=pool_size, strides=strides, padding=padding)(input)
 
 def tf_avg_pool2d(input, pool_size, strides=None, padding='valid'):
@@ -328,7 +323,6 @@ def tf_constant_pad_2d(input, padding, value):
     return tf.pad(input, paddings=[[padding, padding], [padding, padding]], mode='CONSTANT', constant_values=value)
 
 def tf_constant_pad_3d(input, padding, value):
-    # 确保 padding 是整数类型
     if isinstance(padding, tf.Tensor):
         padding = int(padding.numpy())
     paddings = [[padding, padding], [padding, padding], [padding, padding]]
@@ -338,7 +332,7 @@ def tf_constant_pad_3d(input, padding, value):
 
 def tf_conv1d(input, out_channels, kernel_size, stride=1, padding='valid', dilation=1, groups=1, bias=True):
     if isinstance(padding, int):
-        padding = 'valid'  # 默认设置
+        padding = 'valid'
     conv1d = tf.keras.layers.Conv1D(filters=out_channels, kernel_size=kernel_size, strides=stride, padding=padding.lower(), dilation_rate=dilation, groups=groups, use_bias=bias)
     return conv1d(input)
 
@@ -348,10 +342,9 @@ def tf_conv2d(input, out_channels, kernel_size, stride=1, padding='valid', dilat
 
 
 def tf_conv3d(input, out_channels, kernel_size, stride=1, padding='valid', dilation=1, groups=1, bias=True):
-    # 确保 groups 能够整除输入通道数
     in_channels = input.shape[-1]
     if in_channels % groups != 0:
-        groups = 1  # 将 groups 设置为 1 以避免错误
+        groups = 1
     
     conv3d = tf.keras.layers.Conv3D(filters=out_channels, kernel_size=kernel_size, strides=stride, padding=padding.lower(), dilation_rate=dilation, groups=groups, use_bias=bias)
     return conv3d(input)
@@ -396,7 +389,6 @@ def nn_tf_celu(input_tensor, alpha):
     return tf.keras.layers.Activation(lambda x: tf.nn.crelu(x, alpha))(input_tensor)
 
 def nn_tf_constant_pad1d(input, padding, value):
-    # TensorFlow does not have a direct 1D padding, using 2D as workaround
     padded = tf.pad(input, [[0, 0], padding, [0, 0]], mode='CONSTANT', constant_values=value)
     return padded[:, :, 0]
 

@@ -1,4 +1,3 @@
-"""Shared API matching rules for cross-framework mining scripts."""
 
 from __future__ import annotations
 
@@ -6,10 +5,6 @@ import re
 from typing import Union
 
 
-# Xamt++ targets deep-learning framework APIs. NumPy and SciPy are intentionally
-# not standalone target libraries here; they may still appear as implementation
-# helpers or as namespaces owned by DL frameworks, such as jax.numpy or
-# mindspore.scipy.
 NAMESPACES = {
     "torch": [
         "torch",

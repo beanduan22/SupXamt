@@ -2,8 +2,7 @@ from hypothesis import given, strategies as st, settings
 from inputs.input_generator import generate_nn_conv_transpose1d_input
 from utilities.helpers import run_test, finalize_results
 from functions.torch_functions import nn_torch_conv_transpose1d
-from functions.tf_functions import nn_tf_conv_transpose1d  # Ensure TensorFlow has this function properly wrapped if needed
-# Chainer and JAX may not have direct equivalents; this will depend on the specific implementations available
+from functions.tf_functions import nn_tf_conv_transpose1d
 
 api_functions = {
     "pytorch_nn_conv_transpose1d": nn_torch_conv_transpose1d,

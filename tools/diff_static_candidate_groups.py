@@ -1,11 +1,3 @@
-"""Best-effort execution of statically matched API candidate groups.
-
-The static matcher can find hundreds of candidate groups, but many of them are
-not directly differential-testable without hand-written adapters. This script
-still walks every high-confidence static group and tries to execute one callable
-per library using conservative sample inputs. Groups with unsupported or
-incompatible signatures are reported separately from true output differences.
-"""
 
 from __future__ import annotations
 
@@ -25,7 +17,7 @@ import numpy as np
 
 try:
     from .compare_api_matchers import Api, collect_apis, confidence_band, cross_library_groups, group_apis, group_confidence, role_aware_groups
-except ImportError:  # pragma: no cover - allows running as a plain script.
+except ImportError:
     from compare_api_matchers import Api, collect_apis, confidence_band, cross_library_groups, group_apis, group_confidence, role_aware_groups
 
 
@@ -284,7 +276,19 @@ def args_for(api: Api, canonical: str, category: str) -> tuple[tuple[Any, ...], 
         raise SkipCall(f"{canonical} needs framework-specific object/function adapters")
     if canonical in {"from_dlpack", "to_dlpack", "load", "save", "savez"}:
         raise SkipCall(f"{canonical} needs external buffers or files")
-    if canonical in {"assign", "get_device_module", "set_default_device", "set_default_dtype", "initial_seed", "get_rng_state", "set_rng_state"}:
+    if canonical in {
+        "assign",
+        "get_device_module",
+        "set_default_device",
+        "set_default_dtype",
+        "initial_seed",
+        "get_rng_state",
+        "set_rng_state",
+        "get_autocast_cpu_dtype",
+        "get_autocast_gpu_dtype",
+        "get_autocast_dtype",
+        "is_autocast_enabled",
+    }:
         raise SkipCall(f"{canonical} mutates or returns framework runtime state")
     if canonical == "kl_divergence" and (qname.startswith("jax.scipy.special.") or qname == "torch.kl_div"):
         raise SkipCall(f"{qname} is an elementwise KL helper, not the reduced loss API")
@@ -292,6 +296,8 @@ def args_for(api: Api, canonical: str, category: str) -> tuple[tuple[Any, ...], 
         raise SkipCall("MindSpore kl_div expects log-probability inputs and has KLDivLoss semantics")
     if canonical == "inv" and category == "linalg" and qname == "mindspore.ops.function.inv":
         raise SkipCall("mindspore.ops.function.inv is elementwise reciprocal, not matrix inverse")
+    if canonical in {"batch_norm_elemt", "batch_norm_gather_stats_with_counts", "batch_norm_stats", "householder_product", "lstm", "lu_unpack", "orgqr", "ormqr", "split_with_sizes"}:
+        raise SkipCall(f"{canonical} is a low-level/internal API that needs framework-specific state adapters")
     if canonical == "linear" and qname.endswith(".activations.linear"):
         raise SkipCall("activation linear is an identity activation, not an affine layer")
     if canonical == "hardsigmoid" and lib in {"chainer", "mxnet"}:
@@ -360,12 +366,24 @@ def args_for(api: Api, canonical: str, category: str) -> tuple[tuple[Any, ...], 
         raise SkipCall("chainer.functions.copy transfers arrays between devices, not NumPy-style value copying")
     if canonical == "min_scalar_type" and lib == "mxnet":
         raise SkipCall("mxnet.numpy.min_scalar_type cannot encode numpy dtype inputs in this runner")
+    if category == "random" and canonical in {"categorical", "fold_in", "log_uniform_candidate_sampler", "rand_like", "shuffle", "split"}:
+        raise SkipCall(f"{canonical} random API is not value-comparable in this runner")
     if category == "random" and qname.rpartition(".")[2].endswith("_"):
         raise SkipCall("in-place random fill variants mutate an existing tensor")
     if canonical in {"dropout", "dropout1d", "dropout2d", "dropout3d", "alpha_dropout", "feature_alpha_dropout", "rrelu"} and qname.rpartition(".")[2].endswith("_"):
         raise SkipCall("in-place neural-network variants mutate an existing tensor")
-    if canonical == "resize" and qname in {"jax.numpy.resize", "numpy.resize"}:
+    if canonical == "resize" and qname in {"jax.numpy.resize", "mxnet.numpy.resize", "numpy.resize"}:
         raise SkipCall(f"{qname} repeats array data; it is not image resize")
+    if lib == "mxnet" and canonical in {"crop", "depth_to_space", "space_to_depth"}:
+        raise SkipCall(f"MXNet {canonical} needs a layout/operator-specific adapter")
+    if qname == "mxnet.ndarray.random_exponential":
+        raise SkipCall("mxnet.ndarray.random_exponential is a sampler, not elementwise exponential")
+    if lib == "mindspore" and canonical in {"max_unpool1d", "max_unpool2d", "max_unpool3d", "quantile"}:
+        raise SkipCall(f"MindSpore {canonical} is unavailable on the current CPU backend")
+    if lib == "mindspore" and canonical == "space_to_batch_nd":
+        raise SkipCall("MindSpore space_to_batch_nd needs a layout-specific adapter")
+    if lib == "paddle" and canonical == "rms_norm":
+        raise SkipCall("Paddle rms_norm kernel is unavailable in the current runner")
     if canonical == "argpartition" and qname == "keras.ops.argpartition":
         raise SkipCall("keras.ops.argpartition is not value-compatible with numpy argpartition here")
     if canonical == "repeat" and qname == "paddle.tensor.repeat":
@@ -528,6 +546,8 @@ def args_for(api: Api, canonical: str, category: str) -> tuple[tuple[Any, ...], 
         return (tensor(BOOL, lib), tensor(X, lib), tensor(Y, lib)), {}
     if canonical in {"allclose", "isclose"}:
         return (tensor(X, lib), tensor(X + 1e-6, lib)), {}
+    if canonical == "unique":
+        return (tensor(INT_VEC, lib),), {}
     if canonical == "append":
         return (tensor(VEC_A, lib), tensor(VEC_B, lib)), {}
     if canonical == "searchsorted":
@@ -759,6 +779,8 @@ def args_for(api: Api, canonical: str, category: str) -> tuple[tuple[Any, ...], 
     if canonical == "strided_slice":
         if lib == "tensorflow":
             return (tensor(X, lib), [0, 0], [2, 3], [1, 1]), {}
+        if lib == "mindspore":
+            return (tensor(X, lib), (0, 0), (2, 3), (1, 1)), {}
         return (tensor(X, lib), [0, 1], [0, 0], [2, 3], [1, 1]), {}
     if canonical == "index_put":
         base = np.zeros((3,), dtype=np.float32)
@@ -779,7 +801,9 @@ def args_for(api: Api, canonical: str, category: str) -> tuple[tuple[Any, ...], 
                 return (tensor(X, lib), tensor(indices.astype(np.int32), lib), tensor(value, lib)), {"axis": 0}
             return (tensor(X, lib), tensor(indices, lib), 0, tensor(value, lib)), {"alpha": 1.0}
         fill_value = np.array(9.0, dtype=np.float32)
-        if lib == "torch" or lib == "mindspore":
+        if lib == "mindspore":
+            return (tensor(X, lib), 0, tensor(indices.astype(np.int32), lib), float(fill_value)), {}
+        if lib == "torch":
             return (tensor(X, lib), 0, tensor(indices, lib), float(fill_value)), {}
         return (tensor(X, lib), tensor(indices, lib), 0, tensor(fill_value, lib)), {}
     if canonical in {"masked_fill", "masked_scatter", "masked_select"}:
@@ -790,6 +814,14 @@ def args_for(api: Api, canonical: str, category: str) -> tuple[tuple[Any, ...], 
             return (tensor(X, lib), tensor(mask, lib), -9.0), {}
         value = np.array([7.0, 8.0], dtype=np.float32)
         return (tensor(X, lib), tensor(mask, lib), tensor(value, lib)), {}
+    if canonical == "scatter_update":
+        base = np.zeros((3,), dtype=np.float32)
+        if lib == "mindspore":
+            indices = np.array([1, 2], dtype=np.int32)
+        else:
+            indices = np.array([[1], [2]], dtype=np.int64)
+        updates = np.array([5.0, 6.0], dtype=np.float32)
+        return (tensor(base, lib), tensor(indices, lib), tensor(updates, lib)), {}
     if canonical in {"scatter", "scatter_add", "scatter_reduce"}:
         indices = np.array([[0, 2, 1], [1, 0, 2]], dtype=np.int64)
         updates = np.array([[10.0, 20.0, 30.0], [40.0, 50.0, 60.0]], dtype=np.float32)
@@ -805,7 +837,7 @@ def args_for(api: Api, canonical: str, category: str) -> tuple[tuple[Any, ...], 
                 return (tensor(X, lib), tensor(values, lib), 1, 1), {}
             return (tensor(X, lib), tensor(values, lib), 1, 1), {}
         values = np.array([[9.0], [8.0]], dtype=np.float32)
-        if lib == "torch":
+        if lib in {"torch", "mindspore"}:
             return (tensor(X, lib), tensor(values, lib), 1, 1, 2, 1), {}
         return (tensor(X, lib), tensor(values, lib), [1], [1], [2], [1]), {}
     if canonical in {"array_split", "hsplit", "vsplit", "dsplit"}:
@@ -1343,6 +1375,12 @@ def args_for(api: Api, canonical: str, category: str) -> tuple[tuple[Any, ...], 
         pooled = np.array([[[[[8.0]]]]], dtype=np.float32)
         indices = np.array([[[[[7]]]]], dtype=np.int64)
         return (tensor(pooled, lib), tensor(indices, lib), 2), {"stride": 2, "padding": 0, "output_size": (1, 1, 2, 2, 2)}
+    if canonical == "crop_and_resize":
+        image = np.reshape(np.arange(16, dtype=np.float32), (1, 4, 4, 1))
+        boxes = np.array([[0.0, 0.0, 1.0, 1.0]], dtype=np.float32)
+        box_indices = np.array([0], dtype=np.int32)
+        crop_size = np.array([2, 2], dtype=np.int32)
+        return (tensor(image, lib), tensor(boxes, lib), tensor(box_indices, lib), tuple(crop_size.tolist())), {}
     if canonical == "crop":
         image = np.reshape(np.arange(24, dtype=np.float32), (2, 3, 4))
         if lib == "tensorflow":
@@ -1354,6 +1392,8 @@ def args_for(api: Api, canonical: str, category: str) -> tuple[tuple[Any, ...], 
         if canonical == "resize":
             if lib == "numpy":
                 return (image, (3, 4)), {}
+            if lib == "tensorflow":
+                return (tensor(image, lib), (3, 4)), {}
             return (tensor(image, lib), (3, 4, 2)), {}
         if canonical == "flip":
             axis = 0
@@ -1469,6 +1509,12 @@ def args_for(api: Api, canonical: str, category: str) -> tuple[tuple[Any, ...], 
         data = np.array([1.0, -2.0, 3.0, 4.0], dtype=np.float32)
         segment_ids = np.array([0, 0, 1, 1], dtype=np.int32)
         return (tensor(data, lib), tensor(segment_ids, lib)), {}
+    if canonical == "space_to_batch_nd":
+        value = np.reshape(np.arange(4, dtype=np.float32), (1, 2, 2, 1))
+        paddings = np.array([[0, 0], [0, 0]], dtype=np.int32)
+        if lib == "mindspore":
+            return (tensor(value, lib), 2, tuple(map(tuple, paddings.tolist()))), {}
+        return (tensor(value, lib), [2, 2], tensor(paddings, lib)), {}
     if canonical in {"space_to_depth", "depth_to_space"}:
         value = np.reshape(np.arange(16, dtype=np.float32), (1, 2, 2, 4)) if canonical == "depth_to_space" else np.reshape(np.arange(16, dtype=np.float32), (1, 4, 4, 1))
         return (tensor(value, lib), 2), {"data_format": "channels_last"} if lib == "keras" else {}
@@ -1741,6 +1787,8 @@ def args_for(api: Api, canonical: str, category: str) -> tuple[tuple[Any, ...], 
     if canonical == "diag_indices":
         return (3,), {}
     if canonical in {"tril_indices", "triu_indices"}:
+        if lib in {"jax", "keras", "mxnet", "numpy"} or qname.startswith("mindspore.numpy."):
+            return (3,), {"m": 3}
         return (3, 3), {}
     if canonical == "fill_diagonal":
         value = np.zeros((3, 3), dtype=np.float32)
@@ -2249,9 +2297,15 @@ def normalize_result(api: Api, canonical: str, value: Any) -> Any:
     if canonical == "nonzero" and isinstance(value, (list, tuple)):
         return np.stack([array_value(item) for item in value], axis=1)
     if canonical == "clip_by_global_norm" and isinstance(value, (list, tuple)):
-        if len(value) == 2 and not isinstance(value[1], (list, tuple)):
+        if len(value) == 2 and isinstance(value[0], (list, tuple)):
             return value[0]
-        return value
+        if len(value) == 2:
+            try:
+                if np.asarray(array_value(value[1])).shape == ():
+                    return value[0]
+            except Exception:
+                pass
+        return list(value)
     if canonical in {"l1_loss", "mse_loss", "binary_cross_entropy", "kl_divergence"}:
         return global_mean(value)
     if canonical == "lu_factor" and isinstance(value, (list, tuple)):
@@ -2298,6 +2352,8 @@ def normalize_result(api: Api, canonical: str, value: Any) -> Any:
     if canonical == "unravel_index" and isinstance(value, (list, tuple)):
         return np.stack([array_value(item) for item in value])
     if canonical == "unique":
+        if isinstance(value, (list, tuple)):
+            value = value[0]
         return sort_1d_values(value)
     if canonical == "partition":
         return np.sort(np.asarray(real_if_close(value)).reshape(-1))

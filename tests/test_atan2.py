@@ -11,8 +11,6 @@ api_functions = {
     "pytorch_atan2": torch_atan2,
     "tensorflow_atan2": tf_atan2,
     "jax_atan2": jax_atan2,
-    # "chainer_atan2": chainer_atan2,
-    # "keras_atan2": keras_atan2,
 }
 
 @given(input_data=generate_atan2_inputs())

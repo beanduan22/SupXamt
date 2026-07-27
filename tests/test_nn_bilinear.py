@@ -3,7 +3,6 @@ from inputs.input_generator import generate_nn_bilinear_input
 from utilities.helpers import run_test, finalize_results
 from functions.torch_functions import nn_torch_bilinear
 from functions.chainer_functions import nn_chainer_bilinear
-# No TensorFlow or Keras direct equivalent
 
 api_functions = {
     "pytorch_nn_bilinear": nn_torch_bilinear,

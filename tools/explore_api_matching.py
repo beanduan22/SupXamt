@@ -1,9 +1,3 @@
-"""Explore cross-library API matching coverage.
-
-This script is intentionally lightweight: it mines public callables from a set
-of installed libraries and reports how many candidate equivalence groups can be
-formed under increasingly permissive name normalization rules.
-"""
 
 from __future__ import annotations
 
@@ -15,7 +9,7 @@ from dataclasses import dataclass
 
 try:
     from .api_match_common import NAMESPACES, normalize_name
-except ImportError:  # pragma: no cover - allows running as a plain script.
+except ImportError:
     from api_match_common import NAMESPACES, normalize_name
 
 

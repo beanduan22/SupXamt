@@ -20,20 +20,16 @@ def jax_addbmm(A, B, C, beta=1, alpha=1):
     return alpha * jnp.matmul(A, B) + beta * C
 
 def jax_addcdiv(t, x, y, value=1):
-    # Ensure x, y are JAX arrays, if not already
     x = jnp.array(x)
     y = jnp.array(y)
     t = jnp.array(t)
 
-    # Perform the division, multiply by the scalar value, and add to the tensor t
     division_result = jnp.divide(x, y)
     scaled_division = value * division_result
     return t + scaled_division
 
 def jax_addcmul(input, tensor1, tensor2, value=1):
-    # element-wise multiplication
     product = jnp.multiply(tensor1, tensor2)
-    # scaling by 'value' and adding to 'input'
     return input + value * product
 
 
@@ -61,12 +57,9 @@ def jax_amin(x):
 
 
 def jax_angle(x):
-    # 检查输入是非空且包含数据
     if x.size == 0:
         raise ValueError("Input array is empty.")
-    # 计算相位角
     angle = jnp.angle(x)
-    # 根据元素数量返回合适的结果
     return angle.item() if angle.size == 1 else angle
 
 def jax_any(x):
@@ -144,7 +137,7 @@ def jax_blackman_window(window_length):
     return jnp.blackman(window_length)
 
 def jax_cat(tensors, axis=0):
-    tensors = [jnp.array(tensor) for tensor in tensors]  # 转换为 JAX 数组
+    tensors = [jnp.array(tensor) for tensor in tensors]
     return jnp.concatenate(tensors, axis=axis)
 
 def jax_cdist(x1, x2, p=2):
@@ -184,7 +177,6 @@ def jax_celu(input, alpha):
     return jax.nn.celu(input, alpha)
 
 def nn_jax_celu(input_tensor, alpha):
-    # CELU activation in JAX may need to be implemented manually as it's not natively supported
     def celu(x, alpha):
         return jnp.maximum(0, x) + jnp.minimum(0, alpha * (jnp.exp(x / alpha) - 1))
     return celu(input_tensor, alpha)
@@ -199,11 +191,9 @@ def nn_jax_constant_pad3d(input, padding, value):
     return jnp.pad(input, ((0, 0), (0, 0), padding, padding, padding), mode='constant', constant_values=value)
 
 def nn_jax_conv1d(input, out_channels, kernel_size, stride, padding, dilation, groups, bias):
-    # JAX does not have built-in support for grouped convolutions or bias in convolutions, so this is a simplified version.
     return nn.conv(input, out_channels, kernel_size, stride, padding=padding, dilation=dilation)
 
 def nn_jax_conv2d(input, out_channels, kernel_size, stride, padding, dilation, groups, bias):
-    # JAX does not have built-in support for grouped convolutions or bias in convolutions, so this is a simplified version.
     return nn.conv(input, out_channels, kernel_size, stride, padding=padding, dilation=dilation)
 
 def nn_jax_elu(input, alpha):
@@ -222,7 +212,6 @@ def nn_jax_elu(x, alpha=1.0):
     return nn.elu(x, alpha=alpha)
 
 def jax_layer_norm(input, normalized_shape, weight=None, bias=None, eps=1e-05):
-    # JAX does not have a direct equivalent, so this is a placeholder.
     raise NotImplementedError("JAX layer_norm is not implemented.")
 
 def jax_leaky_relu(input, negative_slope=0.01):
@@ -232,7 +221,6 @@ def jax_linear(input, weight, bias=None):
     return jnp.dot(input, weight) + (bias if bias is not None else 0)
 
 def jax_local_response_norm(input, size, alpha=0.0001, beta=0.75, k=1.0):
-    # JAX does not have a direct equivalent, so this is a placeholder.
     raise NotImplementedError("JAX local_response_norm is not implemented.")
 
 def jax_logsigmoid(input):
@@ -242,11 +230,9 @@ def jax_log_softmax(input, axis=None):
     return jax.nn.log_softmax(input, axis=axis)
 
 def jax_lp_pool1d(input, norm_type, kernel_size, stride=None, ceil_mode=False):
-    # JAX does not have a direct equivalent, so this is a placeholder.
     raise NotImplementedError("JAX lp_pool1d is not implemented.")
 
 def jax_lp_pool2d(input, norm_type, kernel_size, stride=None, ceil_mode=False):
-    # JAX does not have a direct equivalent, so this is a placeholder.
     raise NotImplementedError("JAX lp_pool2d is not implemented.")
 def jax_margin_ranking_loss(input1, input2, target, margin=0.0):
     return jax.numpy.mean(jnp.maximum(0, margin - target * (input1 - input2)))
