@@ -58,7 +58,6 @@ External workers:
 - `XAMT_PADDLE_PY` for PaddlePaddle
 - `XAMT_MINDSPORE_PY` for MindSpore
 - `XAMT_CHAINER_PY` for Chainer
-- `XAMT_MXNET_PY` for MXNet
 
 If an external worker is not configured, the runner skips that library during
 API collection or reports it as unavailable during execution. This lets
@@ -99,22 +98,6 @@ Build a clean source artifact archive.
 ```bash
 python -B tools/build_artifact.py
 ```
-
-## How the Pipeline Works
-
-1. `api_match_common.py` defines the target namespaces, alias rules, category
-   terms, and parameter-role normalization.
-2. `compare_api_matchers.py` mines callables, records signatures and docs,
-   groups APIs by canonical name and category, and assigns confidence scores.
-3. `diff_static_candidate_groups.py` maps a group to executable inputs through
-   per-library adapters, normalizes outputs, and labels the execution as
-   `PASS`, `DIFF`, `ERROR`, or `SKIP`.
-4. The `pairwise-adapter-aware` strategy validates executable pair matches and
-   unions passing pairs into connected API components, which are re-validated
-   at the group level.
-5. `timed_group_fuzz.py` refreshes canonical inputs with random, edge-value,
-   and nonfinite states, then repeatedly executes each group within a
-   per-group time budget.
 
 
 ## Bug Reported
